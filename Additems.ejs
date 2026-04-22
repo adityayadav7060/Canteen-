@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Menu Item — CanteenPro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:          #181209;
+    --sidebar:     #1e1509;
+    --surface:     #251c0d;
+    --surface2:    #2e2310;
+    --surface3:    #382b15;
+    --border:      rgba(200,150,60,0.13);
+    --border2:     rgba(200,150,60,0.08);
+    --accent:      #c8813a;
+    --accent-dim:  rgba(200,129,58,0.18);
+    --accent-glow: rgba(200,129,58,0.28);
+    --text:        #ede0c8;
+    --text-muted:  #8a7a60;
+    --text-soft:   #b8a88a;
+    --success:     #5cad7a;
+    --danger:      #d95f5f;
+    --warning:     #d4933a;
+  }
+ 
+  * { margin:0; padding:0; box-sizing:border-box; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+  }
+ 
+  /* Sidebar */
+  .sidebar {
+    width: 220px;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 24px 0;
+    position: fixed; top:0; left:0; bottom:0;
+  }
+ 
+  .logo { padding: 0 20px 22px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+  .logo-avatar {
+    width: 42px; height: 42px;
+    background: linear-gradient(135deg, #c8813a, #7a4c1c);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 10px;
+  }
+  .logo-name { font-family:'DM Serif Display',serif; font-size:18px; color:var(--text); line-height:1.1; }
+  .logo-sub  { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.1em; margin-top:2px; }
+ 
+  .nav-section { padding: 0 10px; }
+  .nav-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.1em; padding:0 10px; margin:14px 0 5px; }
+  .nav-item {
+    display:flex; align-items:center; gap:9px;
+    padding: 8px 10px; border-radius:7px;
+    font-size:13px; color:var(--text-muted);
+    cursor:pointer; transition:all .18s;
+  }
+  .nav-item:hover { background:var(--surface2); color:var(--text); }
+  .nav-item.active { background:var(--accent-dim); color:var(--accent); font-weight:500; }
+  .nav-item svg { width:15px; height:15px; flex-shrink:0; }
+  .badge {
+    margin-left:auto; background:var(--danger); color:white;
+    font-size:10px; font-weight:600; padding:1px 6px; border-radius:10px; min-width:18px; text-align:center;
+  }
+  .badge.amber { background:var(--accent); }
+ 
+  /* Main */
+  .main { margin-left:220px; flex:1; min-height:100vh; display:flex; flex-direction:column; }
+ 
+  /* Topbar */
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 32px; height: 62px;
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:20;
+  }
+  .greeting h2 { font-family:'DM Serif Display',serif; font-size:20px; color:var(--text); }
+  .greeting p  { font-size:12px; color:var(--text-muted); margin-top:1px; }
+  .topbar-right { display:flex; align-items:center; gap:12px; }
+  .search-bar {
+    background:var(--surface2); border:1px solid var(--border); border-radius:8px;
+    display:flex; align-items:center; gap:8px;
+    padding:7px 14px; color:var(--text-muted); font-size:13px;
+    cursor:text; min-width:200px;
+  }
+  .search-bar svg { width:14px; height:14px; flex-shrink:0; }
+  .icon-btn {
+    width:34px; height:34px; border-radius:8px;
+    background:var(--surface2); border:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:var(--text-muted); transition:all .15s; position:relative;
+  }
+  .icon-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .icon-btn .dot {
+    position:absolute; top:6px; right:6px; width:7px; height:7px;
+    border-radius:50%; background:var(--accent); border:1.5px solid var(--surface);
+  }
+  .avatar-btn {
+    width:34px; height:34px; border-radius:8px;
+    background:linear-gradient(135deg,var(--accent),#7a4c1c);
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:700; color:white; cursor:pointer;
+  }
+ 
+  /* Content */
+  .content { padding:28px 32px; max-width:940px; }
+ 
+  .breadcrumb { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-muted); margin-bottom:20px; }
+  .breadcrumb span { color:var(--text-soft); }
+  .breadcrumb .sep { opacity:.4; }
+ 
+  .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:22px; }
+  .page-title { font-family:'DM Serif Display',serif; font-size:26px; color:var(--text); }
+  .page-title em { color:var(--accent); font-style:italic; }
+  .page-sub { font-size:13px; color:var(--text-muted); margin-top:3px; }
+ 
+  /* Form Card */
+  .form-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+ 
+  .form-section {
+    padding:24px 28px; border-bottom:1px solid var(--border2);
+    animation: fadeUp .35s ease both;
+  }
+  .form-section:last-child { border-bottom:none; }
+  .form-section:nth-child(1){animation-delay:.04s}
+  .form-section:nth-child(2){animation-delay:.08s}
+  .form-section:nth-child(3){animation-delay:.12s}
+  .form-section:nth-child(4){animation-delay:.16s}
+  .form-section:nth-child(5){animation-delay:.20s}
+  .form-section:nth-child(6){animation-delay:.24s}
+ 
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(10px) }
+    to   { opacity:1; transform:translateY(0) }
+  }
+ 
+  .sec-label {
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.12em;
+    color:var(--accent); font-weight:600; margin-bottom:18px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+ 
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-grid.triple { grid-template-columns:1fr 1fr 1fr; }
+  .form-full { grid-column:1/-1; }
+ 
+  .field { display:flex; flex-direction:column; gap:6px; }
+  .field label { font-size:12px; color:var(--text-soft); font-weight:500; }
+  .field label span { color:var(--danger); }
+ 
+  input[type=text], input[type=number], textarea, select {
+    background:var(--surface2); border:1.5px solid var(--border);
+    color:var(--text); font-family:'DM Sans',sans-serif; font-size:13.5px;
+    padding:9px 13px; border-radius:8px; outline:none; width:100%;
+    transition:border-color .2s, box-shadow .2s;
+  }
+  input::placeholder, textarea::placeholder { color:var(--text-muted); }
+  input:focus, textarea:focus, select:focus {
+    border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-dim);
+  }
+  select {
+    cursor:pointer; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a7a60' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center; padding-right:32px;
+  }
+  textarea { resize:vertical; min-height:80px; }
+ 
+  .price-wrap { position:relative; }
+  .price-wrap::before {
+    content:'₹'; position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    color:var(--text-muted); font-size:13px; z-index:1;
+  }
+  .price-wrap input { padding-left:26px; }
+ 
+  .char-count { font-size:11px; color:var(--text-muted); text-align:right; margin-top:3px; }
+ 
+  /* Upload */
+  .upload-zone {
+    border:2px dashed var(--border); border-radius:10px;
+    padding:28px 20px; text-align:center; cursor:pointer;
+    transition:all .2s; background:var(--surface2); position:relative;
+  }
+  .upload-zone:hover { border-color:var(--accent); background:rgba(200,129,58,.05); }
+  .upload-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; }
+  .upload-icon {
+    width:44px; height:44px; border-radius:10px;
+    background:var(--accent-dim); border:1px solid rgba(200,129,58,.25);
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 10px; color:var(--accent);
+  }
+  .upload-text { font-size:13px; color:var(--text-soft); }
+  .upload-text strong { color:var(--accent); }
+  .upload-hint { font-size:11.5px; color:var(--text-muted); margin-top:3px; }
+ 
+  /* Tags */
+  .tag-group { display:flex; flex-wrap:wrap; gap:8px; }
+  .tag {
+    padding:6px 14px; border-radius:20px; border:1.5px solid var(--border);
+    font-size:12.5px; color:var(--text-muted); cursor:pointer; transition:all .15s; user-select:none;
+  }
+  .tag:hover { border-color:var(--accent); color:var(--text); }
+  .tag.active { background:var(--accent-dim); border-color:var(--accent); color:var(--accent); }
+ 
+  /* Nutrition */
+  .nutrition-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+  .nutrition-item {
+    background:var(--surface2); border-radius:9px;
+    padding:12px; text-align:center; border:1px solid var(--border2);
+  }
+  .nutrition-item label { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); display:block; margin-bottom:6px; }
+  .nutrition-item input { background:transparent; border:none; text-align:center; font-size:18px; font-weight:600; color:var(--text); padding:0; width:100%; box-shadow:none; }
+  .nutrition-item input:focus { box-shadow:none; border:none; }
+  .nutrition-item span { font-size:11px; color:var(--text-muted); }
+ 
+  /* Toggles */
+  .toggle-row { display:flex; align-items:center; justify-content:space-between; padding:11px 0; }
+  .toggle-row+.toggle-row { border-top:1px solid var(--border2); }
+  .toggle-info h4 { font-size:13.5px; font-weight:500; color:var(--text); }
+  .toggle-info p  { font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+  .toggle {
+    width:40px; height:22px; border-radius:11px;
+    background:var(--surface3); border:1.5px solid var(--border);
+    cursor:pointer; position:relative; transition:background .2s; flex-shrink:0;
+  }
+  .toggle.on { background:var(--accent); border-color:var(--accent); }
+  .toggle::after {
+    content:''; position:absolute; top:3px; left:3px;
+    width:12px; height:12px; border-radius:50%; background:white;
+    transition:left .2s; box-shadow:0 1px 3px rgba(0,0,0,.3);
+  }
+  .toggle.on::after { left:21px; }
+ 
+  /* Actions */
+  .form-actions {
+    padding:20px 28px; display:flex; align-items:center; justify-content:space-between;
+    border-top:1px solid var(--border); background:var(--surface2);
+  }
+  .btn {
+    display:inline-flex; align-items:center; gap:7px;
+    padding:9px 18px; border-radius:8px;
+    font-family:'DM Sans',sans-serif; font-size:13.5px; font-weight:500;
+    cursor:pointer; border:none; transition:all .18s;
+  }
+  .btn-ghost  { background:transparent; color:var(--text-muted); border:1.5px solid var(--border); }
+  .btn-ghost:hover { border-color:var(--text-muted); color:var(--text); }
+  .btn-outline { background:transparent; color:var(--accent); border:1.5px solid var(--accent); }
+  .btn-outline:hover { background:var(--accent-dim); }
+  .btn-primary { background:var(--accent); color:#1a0f02; font-weight:600; box-shadow:0 4px 14px rgba(200,129,58,.35); }
+  .btn-primary:hover { filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 6px 18px rgba(200,129,58,.45); }
+  .btn-primary:active { transform:translateY(0); }
+  .btn-group { display:flex; gap:9px; }
+ 
+  /* Toast */
+  .toast {
+    position:fixed; bottom:24px; right:24px;
+    background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--success);
+    padding:13px 18px; border-radius:10px;
+    display:flex; align-items:center; gap:10px;
+    font-size:13px; color:var(--text);
+    box-shadow:0 8px 28px rgba(0,0,0,.5);
+    transform:translateY(80px); opacity:0;
+    transition:all .35s cubic-bezier(.34,1.56,.64,1);
+    z-index:200;
+  }
+  .toast.show { transform:translateY(0); opacity:1; }
+  .toast-icon { color:var(--success); }
+</style>
+</head>
+<body>
+ 
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-avatar">🍽</div>
+    <div class="logo-name">CanteenPro</div>
+    <div class="logo-sub">Admin Dashboard</div>
+  </div>
+ 
+  <div class="nav-section">
+    <div class="nav-label">Main</div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Overview
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+      Orders <span class="badge">12</span>
+    </div>
+    <div class="nav-item active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+      Menu Items
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Inventory <span class="badge amber">3</span>
+    </div>
+  </div>
+ 
+  <div class="nav-section">
+    <div class="nav-label">Management</div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Staff
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Tables
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Payments
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Promotions
+    </div>
+  </div>
+ 
+  <div class="nav-section">
+    <div class="nav-label">Reports</div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Analytics
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      Reviews
+    </div>
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+      Settings
+    </div>
+  </div>
+</aside>
+ 
+<!-- Main -->
+<form action="/products" method="POST" enctype="multipart/form-data">
+<div class="main">
+  <div class="topbar">
+    <div class="greeting">
+      <h2>Add New Item 🍛</h2>
+      <p>Tuesday, 24 March 2026 · Menu Management</p>
+    </div>
+    <div class="topbar-right">
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Search orders, items…
+      </div>
+      <div class="icon-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <div class="dot"></div>
+      </div>
+      <div class="icon-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      </div>
+      <div class="avatar-btn">AN</div>
+    </div>
+  </div>
+ 
+  <div class="content">
+    <div class="breadcrumb">
+      Overview <span class="sep">›</span> Menu Items <span class="sep">›</span> <span>Add New Item</span>
+    </div>
+    <div class="page-header">
+      <div>
+        <div class="page-title">Add <em>New</em> Menu Item</div>
+        <div class="page-sub">Fill in the details to publish a new dish to the canteen menu.</div>
+      </div>
+    </div>
+ 
+    <div class="form-card">
+ 
+      <!-- Basic Info -->
+       
+      <div class="form-section">
+        <div class="sec-label">Basic Information</div>
+        <div class="form-grid">
+          <div class="field form-full">
+            <label>Item Name <span>*</span></label>
+            <input type="text" name="itemName" placeholder="e.g. Paneer Butter Masala">
+          </div>
+          <div class="field form-full">
+            <label>Description</label>
+            <textarea name="description" placeholder="Describe the dish — ingredients, taste, or preparation style…" oninput="countChars(this,'descCount',200)"></textarea>
+            <div class="char-count"><span id="descCount">0</span> / 200</div>
+          </div>
+          <div class="field">
+            <label>Category <span>*</span></label>
+            <select name="category" required>
+  <option value="" disabled selected>Select category</option>
+              <option>🍛 Main Course</option>
+              <option>🥗 Salads & Starters</option>
+              <option>🥪 Snacks</option>
+              <option>🍜 Noodles & Rice</option>
+              <option>🧆 Street Food</option>
+              <option>🍰 Desserts</option>
+              <option>☕ Beverages</option>
+              <option>🥤 Juices & Shakes</option>
+              <option>🍳 Breakfast</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Cuisine Type</label>
+            <select>
+              <option value="" disabled selected name="cuisine">Select cuisine</option>
+              <option>Indian</option>
+              <option>South Indian</option>
+              <option>Chinese</option>
+              <option>Continental</option>
+              <option>Italian</option>
+              <option>Mexican</option>
+              <option>Thai</option>
+            </select>
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Image Upload -->
+      <div class="form-section">
+        <div class="sec-label">Item Image</div>
+        <div class="upload-zone">
+          <input type="file" accept="image/*" name="image" onchange="handleImage(this)">
+          <div class="upload-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="upload-text"><strong>Click to upload</strong> or drag & drop</div>
+          <div class="upload-hint">PNG, JPG, WEBP · max 5 MB · recommended 800×600 px</div>
+          <div id="imgPreview"></div>
+        </div>
+      </div>
+ 
+      <!-- Pricing -->
+      <div class="form-section">
+        <div class="sec-label">Pricing & Portion</div>
+        <div class="form-grid triple">
+          <div class="field">
+            <label>Selling Price <span>*</span></label>
+            <div class="price-wrap"><input type="number" name="price" placeholder="0.00" min="0"></div>
+          </div>
+          <div class="field">
+            <label>Cost Price</label>
+            <div class="price-wrap"><input type="number" name="cost_price"  placeholder="0.00" min="0"></div>
+          </div>
+          <div class="field">
+            <label>Portion Size </label>
+            <select name="portion_size">
+              <option>Small</option>
+              <option selected>Regular</option>
+              <option>Large</option>
+              <option>Half Plate</option>
+              <option>Full Plate</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Preparation Time</label>
+            <input type="text" name="prep_time" placeholder="e.g. 10–15 mins">
+          </div>
+          <div class="field">
+            <label>Daily Stock Limit</label>
+            <input type="number" name="stock_limit" placeholder="Blank = unlimited" min="0">
+          </div>
+          <div class="field">
+            <label>Calories (approx.)</label>
+            <input type="number" name="calories" placeholder="kcal" min="0">
+          </div>
+        </div>
+      </div>
+ 
+      <!-- Tags -->
+      <div class="form-section">
+        <div class="sec-label">Dietary Tags</div>
+        <div class="tag-group">
+          <div class="tag active" name="is_veg" onclick="toggleTag(this)">🥬 Vegetarian</div>
+          <div class="tag" name="is_vegan" onclick="toggleTag(this)">🌱 Vegan</div>
+          <div class="tag" name="is_gluten_free"  onclick="toggleTag(this)">🌾 Gluten-Free</div>
+          <div class="tag" name="" onclick="toggleTag(this)">🥛 Dairy-Free</div>
+          <div class="tag" name="is_spicy" onclick="toggleTag(this)">🌶️ Spicy</div>
+          <div class="tag" name="" onclick="toggleTag(this)">🔥 Chef's Special</div>
+          <div class="tag" name="" onclick="toggleTag(this)">⭐ Best Seller</div>
+          <div class="tag" name="" onclick="toggleTag(this)">🆕 New Arrival</div>
+          <div class="tag" name="" onclick="toggleTag(this)">🥜 Contains Nuts</div>
+          <div class="tag" name="" onclick="toggleTag(this)">🍖 Non-Veg</div>
+          <div class="tag" name="" onclick="toggleTag(this)">🧈 Jain</div>
+        </div>
+      </div>
+ 
+      
+ 
+      <!-- Availability -->
+      <div class="form-section">
+        <div class="sec-label">Availability</div>
+        <div class="toggle-row">
+          <div class="toggle-info" name="show_menu">
+            <h4>Show on Menu</h4>
+            <p>Make this item visible to students immediately</p>
+          </div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info" name="featured">
+            <h4>Featured Item</h4>
+            <p>Highlight on the canteen homepage & top banner</p>
+          </div>
+          <div class="toggle" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info" name="takeaway">
+            <h4>Takeaway Available</h4>
+            <p>Allow packing for takeaway orders</p>
+          </div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+ 
+      <!-- Actions -->
+      <div class="form-actions">
+        <button class="btn btn-ghost">✕ Discard</button>
+        <div class="btn-group" >
+          <button class="btn btn-outline" type="submit" onclick="saveDraft()">Save as Draft</button>
+          <button type="submit" class="btn btn-primary">
+  Publish Item
+</button>
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+</div>
+</form>
+ 
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✓</span>
+  <span id="toastMsg">Item published successfully!</span>
+</div>
+ 
+<script>
+  function toggleTag(el) { el.classList.toggle('active'); }
+  function countChars(el, id, max) {
+    const c = Math.min(el.value.length, max);
+    document.getElementById(id).textContent = c;
+    if (el.value.length > max) el.value = el.value.slice(0, max);
+  }
+  function handleImage(input) {
+    if (!input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('imgPreview').innerHTML =
+        `<img src="${e.target.result}" style="max-height:90px;border-radius:7px;margin-top:10px;box-shadow:0 4px 12px rgba(0,0,0,.5);">`;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+  function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    t.style.borderLeftColor = type === 'draft' ? 'var(--accent)' : 'var(--success)';
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+  function saveDraft() { showToast('Draft saved — publish anytime.', 'draft'); }
+  function publishItem() {
+    const name = document.getElementById('itemName').value.trim();
+    showToast(name ? `"${name}" is now live on the menu!` : 'Item published to menu!');
+  }
+</script>
+</body>
+</html>
